@@ -20,7 +20,7 @@ Remember to grant all `repo` permissions.
 
 Once created save the token in an environment variable:
 
-```shell-session
+```bash
 export GITHUB_TOKEN=<TOKEN_ID>
 export GITHUB_USER=<MY_GITHUB_USER> (e.g. nikever)
 ```
@@ -29,13 +29,13 @@ export GITHUB_USER=<MY_GITHUB_USER> (e.g. nikever)
 
 At the root level of this repository, execute:
 
-```shell-session
+```bash
 export REPO_DIR=$(PWD)
 ```
 
 Start a minikube cluster:
 
-```shell-session
+```bash
 cd $REPO_DIR/minikube
 make setup
 ```
@@ -44,7 +44,7 @@ By default, it will spin up a one node Kubernetes cluster of version `v1.19.4` i
 
 You can pass additional parameters to change the default values:
 
-```shell-session
+```bash
 make setup cpu=2 memory=2048
 ```
 
@@ -58,7 +58,7 @@ Please referer to this [Makefile](minikube/Makefile) for additional details on t
 
 We are going to bootstrap flux via the cli:
 
-```shell-session
+```bash
 flux bootstrap github \
     --owner $GITHUB_USER \
     --repository fury-flux-fleet \
@@ -71,13 +71,13 @@ The bootstrap command creates a repository if one doesn't exist, commits the man
 
 Wait for the pods to be up and running:
 
-```shell-session
+```bash
 kubectl -n flux-system get pods -w
 ```
 
 ### Clone the created repository
 
-```shell-session
+```bash
 mkdir cd $REPO_DIR/demo
 cd demo
 
@@ -97,7 +97,7 @@ mkdir -p $REPO_DIR/clusters/fury-minimal-cluster/fury/
 
 Create a `GitRepository` manifest pointing to [*Fury Distribution Minimal*](https://github.com/nikever/fury-distribution-minimal) repository's master branch:
 
-```shell-session
+```bash
 flux create source git fury-distribution \
     --url https://github.com/nikever/fury-distribution-minimal \
     --branch main \
@@ -110,7 +110,7 @@ flux create source git fury-distribution \
 
 Create a Flux `Kustomization` manifest for the *Fury distribution*. This configures Flux to build and apply the kustomize directory located in the *Fury Distribution Minimal* repository under the `fury` folder.
 
-```shell-session
+```bash
 flux create kustomization fury-distribution \
   --source=fury-distribution \
   --path="./fury" \
@@ -126,21 +126,21 @@ We don't perform any `validation` due to some race-condition on Custom Resource 
 
 Commit and push to deploy the *Fury Distribution* in the cluster:
 
-```shell-session
+```bash
 git add -A && git commit -m "Add Fury Minimal Distribution GitRepository and Kustomization"
 git push
 ```
 
 Wait for Flux to reconcile everything:
 
-```shell-session
+```bash
 watch flux get sources git
 watch flux get kustomizations
 ```
 
 Wait for pods to be up and running:
 
-```shell-session
+```bash
 kubectl get pods -A -w
 ```
 
@@ -148,7 +148,7 @@ kubectl get pods -A -w
 
 Use `minikube ip` to get the external IP of the cluster:
 
-```shell-session
+```bash
 $ minikube ip     
 192.168.99.113
 ```
@@ -191,7 +191,7 @@ mkdir -p $REPO_DIR/clusters/fury-minimal-cluster/hello-app/
 
 Now, we can create a `GitRepository` manifest pointing to the [*Hello App*](https://github.com/nikever/kubernetes-hello-app). We will point to the branch `hello-app-1.0` that uses the `gcr.io/google-samples/hello-app:1.0` image.
 
-```shell-session
+```bash
 cd $REPO_DIR
 
 flux create source git hello-app \
@@ -202,7 +202,7 @@ flux create source git hello-app \
     > ./clusters/fury-minimal-cluster/hello-app/hello-app-source.yaml
 ```
 
-```shell-session
+```bash
 flux create kustomization hello-app \
   --source=hello-app \
   --path="." \
@@ -214,21 +214,21 @@ flux create kustomization hello-app \
 
 Commit and push to deploy the *Hello App*:
 
-```shell-session
+```bash
 git add -A && git commit -m "Add hello-app GitRepository and Kustomization"
 git push
 ```
 
 Wait for Flux to reconcile everything:
 
-```shell-session
+```bash
 watch flux get sources git
 watch flux get kustomizations
 ```
 
 Wait for pods to be up and running:
 
-```shell-session
+```bash
 kubectl get pods -n logging -w
 ```
 
@@ -295,7 +295,7 @@ It is okay for a quick demo, consider alternatives in a real setup.
 
 #### Generate ssh credentials
 
-```shell-session
+```bash
 mkdir secrets
 
 ssh-keygen -q -N "" -f ./secrets/identity
@@ -315,7 +315,7 @@ Add it to deploy keys under `https://github.com/<GITHUB_USER>/<REPOSITORY>/setti
 
 #### Create secret
 
-```shell-session
+```bash
 kubectl create secret generic ssh-credentials \
     --from-file=./secrets/identity \
     --from-file=./secrets/identity.pub \
@@ -325,7 +325,7 @@ kubectl create secret generic ssh-credentials \
 
 #### Create GitRepository
 
-```shell-session
+```bash
 flux create source git fury-distribution \
     --url PRIVATE_REPO/fury-distribution-minimal \
     --branch master \

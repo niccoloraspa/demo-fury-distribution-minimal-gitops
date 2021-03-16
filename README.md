@@ -6,8 +6,7 @@ For a regular deployment in a minikube environment without GitOps go [here](http
 
 ## Tools
 
-- flux v2 `>= 0.9` ([installation guide](https://toolkit.fluxcd.io/guides/installation/))
-- furyctl `>= 0.4` ([installation guide](https://github.com/sighupio/furyctl#install))
+- fluxcd v2 `>= 0.9` ([installation guide](https://toolkit.fluxcd.io/guides/installation/))
 - minikube `>= v1.18` ([installation guide](https://minikube.sigs.k8s.io/docs/start/))
 
 There are various others GitOps tools available (e.g. Argo CD), for this demo I choose Flux v2.
@@ -48,7 +47,7 @@ You can pass additional parameters to change the default values:
 make setup cpu=2 memory=2048
 ```
 
-If you reduce the `memory` and `cpu` of the node, remember to adjust resources requests and limits accordingly.
+If you reduce the `memory` and `cpu` of the node, remember to adjust resources requests and limits in the patches of the [fury-distribution-minimal](https://github.com/nikever/fury-distribution-minimal).
 
 Please referer to this [Makefile](minikube/Makefile) for additional details on the cluster creation.
 
@@ -120,7 +119,7 @@ flux create kustomization fury-distribution \
   > ./clusters/fury-minimal-cluster/fury/fury-distribution-kustomization.yaml
 ```
 
-We don't perform any `validation` due to some race-condition on Custom Resource Definitions (CRDs). This happens because CRDs are referenced before they are created.
+We don't perform any `validation` (neither on client nor server) due to some race-condition on Custom Resource Definitions (CRDs). This happens because CRDs are referenced before they are created, resulting in an error. Without the validation we force the `kustomize apply` until the actual state matches the desired state.
 
 ### Deploy via GitOps
 

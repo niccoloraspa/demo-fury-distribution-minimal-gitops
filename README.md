@@ -90,7 +90,7 @@ cd fury-flux-fleet
 Create a folder for the Fury distribution:
 
 ```bash
-mkdir -p $REPO_DIR/clusters/fury-minimal-cluster/fury/
+mkdir -p ./clusters/fury-minimal-cluster/fury/
 ```
 
 ### Create Flux GitRepository
@@ -186,14 +186,12 @@ We are going to deploy `gcr.io/google-samples/hello-app:1.0` first, and then upd
 Let's create a new directory first for our app:
 
 ```bash
-mkdir -p $REPO_DIR/clusters/fury-minimal-cluster/hello-app/
+mkdir -p ./clusters/fury-minimal-cluster/hello-app/
 ```
 
 Now, we can create a `GitRepository` manifest pointing to the [*Hello App*](https://github.com/nikever/kubernetes-hello-app). We will point to the branch `hello-app-1.0` that uses the `gcr.io/google-samples/hello-app:1.0` image.
 
 ```bash
-cd $REPO_DIR
-
 flux create source git hello-app \
     --url https://github.com/nikever/kubernetes-hello-app \
     --branch hello-app-1.0 \
@@ -269,20 +267,7 @@ Ensure that the version is `1.0.0`.
 To update the app, we simply going to change the branch of the `hello-app` GitRepository from `branch: hello-app-1.0` to `branch: hello-app-2.0`.
 
 ```bash
-cat >> ./clusters/fury-minimal-cluster/hello-app/hello-app-source.yaml << EOF
-
----
-apiVersion: source.toolkit.fluxcd.io/v1beta1
-kind: GitRepository
-metadata:
-  name: hello-app
-  namespace: flux-system
-spec:
-  interval: 1m0s
-  ref:
-    branch: hello-app-2.0
-  url: https://github.com/nikever/kubernetes-hello-app
-EOF
+sed -i "" "s/hello-app-1.0/hello-app-2.0/g" clusters/fury-minimal-cluster/hello-app/hello-app-source.yaml
 ```
 
 Commit to apply:

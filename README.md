@@ -78,8 +78,8 @@ kubectl -n flux-system get pods -w
 ### Clone the created repository
 
 ```bash
-mkdir cd $REPO_DIR/demo
-cd demo
+mkdir $REPO_DIR/demo
+cd $REPO_DIR/demo
 
 git clone https://github.com/$GITHUB_USER/fury-flux-fleet
 cd fury-flux-fleet
@@ -264,6 +264,55 @@ Hostname: hello-app-5c4957dcc4-l4mqz
 
 Ensure that the version is `1.0.0`.
 
+### Update the app
+
+To update the app, we simply going to change the branch of the `hello-app` GitRepository from `branch: hello-app-1.0` to `branch: hello-app-2.0`.
+
+```bash
+cat >> ./clusters/fury-minimal-cluster/hello-app/hello-app-source.yaml << EOF
+
+---
+apiVersion: source.toolkit.fluxcd.io/v1beta1
+kind: GitRepository
+metadata:
+  name: hello-app
+  namespace: flux-system
+spec:
+  interval: 1m0s
+  ref:
+    branch: hello-app-2.0
+  url: https://github.com/nikever/kubernetes-hello-app
+EOF
+```
+
+Commit to apply:
+
+```bash
+git add -A && git commit -m "Add hello-app GitRepository and Kustomization"
+git push
+```
+
+Wait for Flux to reconcile everything:
+
+```bash
+watch flux get sources git
+watch flux get kustomizations
+```
+
+Now you can retry the app:
+
+```bash
+curl hello-world.info
+```
+
+It should output `Version: 2.0.0`:
+
+```bash
+Hello, world!
+Version: 2.0.0
+Hostname: hello-app-5c4957dcc4-l4mqz
+```
+
 ## 4. Clean up
 
 To clean up:
@@ -277,7 +326,7 @@ make delete
 
 - delete the lines you added in the `/etc/hosts`
 
-- delete the `fury-flux-fleet` repository
+- delete the `fury-flux-fleet` repository (optional).
 
 ## Additions
 
@@ -332,7 +381,7 @@ flux create source git fury-distribution \
     --interval 1m \
     --secret-ref ssh-credentials \
     --export \
-    | tee ./clusters/fury-minimal-cluster/fury-distribution-source.yaml
+    | tee ./clusters/fury-minimal-cluster/fury/fury-distribution-source.yaml
 ```
 
 ## Credits

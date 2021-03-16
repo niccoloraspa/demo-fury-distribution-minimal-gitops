@@ -1,0 +1,12 @@
+---
+apiVersion: source.toolkit.fluxcd.io/v1beta1
+kind: GitRepository
+metadata:
+  name: hello-app
+  namespace: flux-system
+spec:
+  interval: 1m0s
+  ref:
+    branch: hello-app-2.0
+  url: https://github.com/nikever/kubernetes-hello-app
+

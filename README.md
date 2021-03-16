@@ -272,7 +272,7 @@ sed -i "" "s/hello-app-1.0/hello-app-2.0/g" clusters/fury-minimal-cluster/hello-
 Commit to apply:
 
 ```bash
-git add -A && git commit -m "Add hello-app GitRepository and Kustomization"
+git add -A && git commit -m "Update hello-app to v2.0.0"
 git push
 ```
 
